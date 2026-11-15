@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}VELORA — {{ movie.title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .detail-wrapper {
+        max-width: var(--container-max);
+        margin: 2.5rem auto 5rem;
+        padding: 0 1.5rem;
+    }
+
+    .breadcrumbs {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .breadcrumbs a:hover {
+        color: var(--gold-primary);
+    }
+
+    /* Film Showcase Banner */
+    .film-showcase {
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: 3.5rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--gold-border);
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        margin-bottom: 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .film-showcase::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 400px;
+        height: 100%;
+        background: radial-gradient(circle at 100% 0%, rgba(214, 181, 116, 0.06) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .film-poster-container {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--gold-border-bright);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+        aspect-ratio: 2 / 3;
+        background: #0B0E17;
+    }
+
+    .film-poster-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .film-info-col {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .film-eyebrow {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--gold-primary);
+        margin-bottom: 0.75rem;
+    }
+
+    .film-title {
+        font-family: var(--font-serif);
+        font-size: clamp(2.2rem, 4vw, 3.2rem);
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        color: var(--text-primary);
+        margin-bottom: 1.25rem;
+        line-height: 1.15;
+    }
+
+    .film-badge-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+        flex-wrap: wrap;
+    }
+
+    .film-rating-pill {
+        background: rgba(214, 181, 116, 0.15);
+        border: 1px solid var(--gold-border-bright);
+        color: var(--gold-primary);
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 0.35rem 0.8rem;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .film-meta-pill {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-secondary);
+        font-size: 0.82rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 4px;
+    }
+
+    .film-synopsis {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        line-height: 1.8;
+        margin-bottom: 2rem;
+        max-width: 720px;
+    }
+
+    /* Screenings / Theatres Section */
+    .screenings-header {
+        text-align: left;
+        margin-bottom: 2rem;
+    }
+
+    .theatre-screenings-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--gold-border);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        transition: var(--transition-smooth);
+    }
+
+    .theatre-screenings-card:hover {
+        border-color: var(--gold-border-bright);
+    }
+
+    .theatre-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid rgba(214, 181, 116, 0.1);
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .theatre-title {
+        font-family: var(--font-serif);
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .theatre-loc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .showtimes-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+    }
+
+    .showtime-pill {
+        background: rgba(16, 21, 34, 0.9);
+        border: 1px solid var(--gold-border);
+        border-radius: 8px;
+        padding: 1rem 1.4rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.35rem;
+        transition: var(--transition-smooth);
+        min-width: 150px;
+        text-decoration: none !important;
+    }
+
+    .showtime-pill:hover {
+        background: rgba(214, 181, 116, 0.12);
+        border-color: var(--gold-primary);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px var(--gold-glow);
+    }
+
+    .showtime-hour {
+        font-family: var(--font-serif);
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--gold-primary);
+    }
+
+    .showtime-date {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        letter-spacing: 0.05em;
+    }
+
+    .showtime-screen {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .showtime-price {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-top: 0.25rem;
+    }
+
+    @media (max-width: 900px) {
+        .film-showcase {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .film-poster-container {
+            max-width: 280px;
+            margin: 0 auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-wrapper">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="{% url 'home' %}">Home</a>
+        <span>/</span>
+        <a href="{% url 'home' %}#movies">Now Showing</a>
+        <span>/</span>
+        <span style="color: var(--gold-primary);">{{ movie.title }}</span>
+    </nav>
+
+    <!-- Poster selection matching existing assets -->
+    {% if movie.title == "Inception" %}
+        {% static "booking/images/posters/inception.jpg" as poster_src %}
+    {% elif movie.title == "Interstellar" %}
+        {% static "booking/images/posters/interstellar.jpg" as poster_src %}
+    {% elif movie.title == "3 Idiots" %}
+        {% static "booking/images/posters/3-idiots.jpg" as poster_src %}
+    {% else %}
+        {% static "booking/images/posters/default-poster.jpg" as poster_src %}
+    {% endif %}
+
+    <!-- Film Showcase Banner -->
+    <div class="film-showcase">
+        <div class="film-poster-container">
+            <img src="{{ poster_src }}" alt="{{ movie.title }} Poster" class="film-poster-img" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'450\' fill=\'%23101522\'><rect width=\'100%25\' height=\'100%25\' fill=\'%23101522\'/><text x=\'50%25\' y=\'50%25\' fill=\'%23D6B574\' font-family=\'Cinzel\' font-size=\'20\' text-anchor=\'middle\'>VELORA</text></svg>';">
+        </div>
+
+        <div class="film-info-col">
+            <span class="film-eyebrow">VELORA FEATURE PRESENTATION</span>
+            <h1 class="film-title">{{ movie.title }}</h1>
+
+            <div class="film-badge-row">
+                {% if movie.rating %}
+                <span class="film-rating-pill">★ {{ movie.rating }} / 10</span>
+                {% endif %}
+
+                {% if movie.genre %}
+                <span class="film-meta-pill">{{ movie.genre }}</span>
+                {% endif %}
+
+                {% if movie.duration %}
+                <span class="film-meta-pill">{{ movie.duration }} Minutes</span>
+                {% endif %}
+
+                {% if movie.language %}
+                <span class="film-meta-pill">{{ movie.language }}</span>
+                {% endif %}
+
+                {% if movie.release_date %}
+                <span class="film-meta-pill">Released {{ movie.release_date|date:"Y" }}</span>
+                {% endif %}
+            </div>
+
+            <p class="film-synopsis">
+                {% if movie.description %}
+                    {{ movie.description }}
+                {% else %}
+                    Indulge in the cinematic excellence of {{ movie.title }}, remastered and presented in ultra-high fidelity across VELORA auditoriums.
+                {% endif %}
+            </p>
+
+            <div>
+                <a href="#screenings" class="btn-gold">View Showtimes & Theatres</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theatres & Showtimes Section -->
+    <section id="screenings">
+        <div class="screenings-header">
+            <span class="film-eyebrow">Select Theatre & Showtime</span>
+            <h2 style="font-family: var(--font-serif); font-size: 2rem;">Available Screenings</h2>
+        </div>
+
+        {% if theatre_shows %}
+            {% for theatre, shows_list in theatre_shows.items %}
+            <div class="theatre-screenings-card">
+                <div class="theatre-card-top">
+                    <div>
+                        <h3 class="theatre-title">{{ theatre.theatre_name }}</h3>
+                        <div class="theatre-loc">📍 {{ theatre.location }} • Dolby Atmos® & 4K Laser</div>
+                    </div>
+                    <span style="font-size: 0.8rem; color: var(--gold-primary); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600;">
+                        {{ shows_list|length }} Showtime{{ shows_list|length|pluralize }}
+                    </span>
+                </div>
+
+                <div class="showtimes-grid">
+                    {% for show in shows_list %}
+                    <a href="{% url 'seat_selection' show.show_id %}" class="showtime-pill" title="Reserve seats for {{ show.show_time|time:'g:i A' }}">
+                        <span class="showtime-date">{{ show.show_date|date:"D, M d" }}</span>
+                        <span class="showtime-hour">{{ show.show_time|time:"g:i A" }}</span>
+                        <span class="showtime-screen">{{ show.screen.screen_name }}</span>
+                        <span class="showtime-price">₹{{ show.ticket_price }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="background: var(--bg-surface); padding: 3rem; text-align: center; border: 1px dashed var(--gold-border); border-radius: 12px;">
+                <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1.5rem;">
+                    No upcoming screenings are currently scheduled for this title.
+                </p>
+                <a href="{% url 'home' %}#movies" class="btn-outline-gold">Explore Other Films</a>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}VELORA — Reservation Confirmed #{{ booking.booking_id }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .success-page-wrapper {
+        max-width: 800px;
+        margin: 3rem auto 6rem;
+        padding: 0 1.5rem;
+    }
+
+    .success-alert-card {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .success-icon-badge {
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        background: rgba(214, 181, 116, 0.15);
+        border: 2px solid var(--gold-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: var(--gold-primary);
+        font-size: 2rem;
+        box-shadow: 0 0 24px var(--gold-glow);
+    }
+
+    .success-title {
+        font-family: var(--font-serif);
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .success-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    /* Luxury Ticket Card */
+    .digital-pass {
+        background: var(--bg-surface);
+        border: 1px solid var(--gold-border-bright);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(214, 181, 116, 0.1);
+        position: relative;
+    }
+
+    .pass-header {
+        background: linear-gradient(135deg, #1C2438 0%, #101522 100%);
+        padding: 2rem 2.5rem;
+        border-bottom: 1px dashed var(--gold-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .pass-brand {
+        font-family: var(--font-serif);
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 0.28em;
+        color: var(--gold-primary);
+    }
+
+    .pass-status-pill {
+        background: rgba(214, 181, 116, 0.15);
+        border: 1px solid var(--gold-border-bright);
+        color: var(--gold-light);
+        padding: 0.35rem 0.9rem;
+        border-radius: 50px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .pass-body {
+        padding: 2.5rem;
+    }
+
+    .pass-film-title {
+        font-family: var(--font-serif);
+        font-size: 1.85rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1.75rem;
+    }
+
+    .pass-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.75rem 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .pass-info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .pass-info-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .pass-info-value {
+        font-size: 1.05rem;
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+
+    .pass-seats-box {
+        background: rgba(16, 21, 34, 0.7);
+        border: 1px solid var(--gold-border);
+        border-radius: 8px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .pass-seat-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, rgba(214, 181, 116, 0.2) 0%, rgba(214, 181, 116, 0.08) 100%);
+        border: 1px solid var(--gold-border-bright);
+        color: var(--gold-primary);
+        padding: 0.35rem 0.8rem;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin: 0.25rem 0.35rem 0.25rem 0;
+    }
+
+    .pass-footer-bar {
+        background: rgba(16, 21, 34, 0.95);
+        padding: 1.5rem 2.5rem;
+        border-top: 1px solid var(--gold-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .pass-barcode-graphic {
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.35em;
+        color: var(--gold-primary);
+        font-size: 1rem;
+        user-select: none;
+        opacity: 0.85;
+    }
+
+    .ticket-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1.25rem;
+        margin-top: 2.5rem;
+        flex-wrap: wrap;
+    }
+
+    @media print {
+        header, footer, .ticket-actions, .ambient-glow {
+            display: none !important;
+        }
+
+        body {
+            background: #FFFFFF !important;
+            color: #000000 !important;
+        }
+
+        .digital-pass {
+            border: 2px solid #000000 !important;
+            box-shadow: none !important;
+            color: #000000 !important;
+            background: #FFFFFF !important;
+        }
+
+        .pass-film-title, .pass-info-value, .pass-brand {
+            color: #000000 !important;
+        }
+
+        .pass-seat-badge {
+            border: 1px solid #000000 !important;
+            color: #000000 !important;
+            background: #EEEEEE !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-page-wrapper">
+    <div class="success-alert-card">
+        <div class="success-icon-badge">✓</div>
+        <h1 class="success-title">Your Experience is Reserved</h1>
+        <p class="success-subtitle">
+            A confirmation record has been safely written to MySQL. Present this digital ticket upon arrival at the auditorium.
+        </p>
+    </div>
+
+    <!-- Digital Boarding Pass -->
+    <div class="digital-pass">
+        <div class="pass-header">
+            <div>
+                <div class="pass-brand">VELORA</div>
+                <div style="font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-primary);">
+                    Official Admission Pass
+                </div>
+            </div>
+
+            <span class="pass-status-pill">{{ booking.booking_status }}</span>
+        </div>
+
+        <div class="pass-body">
+            <h2 class="pass-film-title">{{ booking.show.movie.title }}</h2>
+
+            <div class="pass-info-grid">
+                <div class="pass-info-item">
+                    <span class="pass-info-label">Booking Reference</span>
+                    <span class="pass-info-value" style="color: var(--gold-primary); font-family: var(--font-serif); font-weight: 700;">
+                        #VEL-{{ booking.booking_id }}
+                    </span>
+                </div>
+
+                <div class="pass-info-item">
+                    <span class="pass-info-label">Primary Guest</span>
+                    <span class="pass-info-value">{{ booking.customer.name }}</span>
+                </div>
+
+                <div class="pass-info-item">
+                    <span class="pass-info-label">Venue &amp; Screen</span>
+                    <span class="pass-info-value">
+                        {{ booking.show.screen.theatre.theatre_name }} • {{ booking.show.screen.screen_name }}
+                    </span>
+                </div>
+
+                <div class="pass-info-item">
+                    <span class="pass-info-label">Destination</span>
+                    <span class="pass-info-value">{{ booking.show.screen.theatre.location }}</span>
+                </div>
+
+                <div class="pass-info-item">
+                    <span class="pass-info-label">Date of Screening</span>
+                    <span class="pass-info-value">{{ booking.show.show_date|date:"l, F d, Y" }}</span>
+                </div>
+
+                <div class="pass-info-item">
+                    <span class="pass-info-label">Showtime</span>
+                    <span class="pass-info-value">{{ booking.show.show_time|time:"g:i A" }}</span>
+                </div>
+            </div>
+
+            <div class="pass-seats-box">
+                <div class="pass-info-label" style="margin-bottom: 0.75rem;">
+                    Confirmed Reserved Seats ({{ booking_seats|length }})
+                </div>
+                <div>
+                    {% for bs in booking_seats %}
+                    <span class="pass-seat-badge">
+                        Seat {{ bs.show_seat.seat.seat_number }} ({{ bs.show_seat.seat.seat_type }})
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="pass-footer-bar">
+            <div>
+                <span class="pass-info-label">Total Booking Amount</span>
+                <div style="font-family: var(--font-serif); font-size: 1.5rem; font-weight: 700; color: var(--gold-primary);">
+                    ₹{{ booking.total_amount }}
+                </div>
+            </div>
+
+            <div class="pass-barcode-graphic">
+                ||| | ||||| || |||| |||
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="ticket-actions">
+        <button onclick="window.print()" class="btn-gold">
+            🖨 Print Digital Ticket
+        </button>
+        <a href="{% url 'home' %}" class="btn-outline-gold">
+            Return to Homepage
+        </a>
+    </div>
+</div>
+{% endblock %}

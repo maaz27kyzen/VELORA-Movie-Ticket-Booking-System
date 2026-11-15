@@ -1,0 +1,114 @@
+/* VELORA Django Admin Theme */
+
+:root {
+    --velora-bg: #101522;
+    --velora-card: #171F30;
+    --velora-gold: #D6B574;
+    --velora-text: #F5F1E8;
+    --velora-muted: #A6ADBB;
+}
+
+/* Main background */
+body,
+#container {
+    background: var(--velora-bg) !important;
+    color: var(--velora-text);
+}
+
+/* Header */
+#header {
+    background: var(--velora-card);
+    border-bottom: 1px solid var(--velora-gold);
+}
+
+#header a,
+#header #site-name a {
+    color: var(--velora-gold) !important;
+}
+
+/* Main content */
+#content,
+#content-main {
+    background: var(--velora-bg);
+    color: var(--velora-text);
+}
+
+/* Module headings */
+.module h2,
+.module caption,
+.inline-group h2 {
+    background: var(--velora-card);
+    color: var(--velora-gold);
+}
+
+/* Links */
+a:link,
+a:visited {
+    color: var(--velora-gold);
+}
+
+/* Buttons */
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input {
+    background: var(--velora-gold) !important;
+    color: #101522 !important;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+}
+
+/* Form fields */
+input,
+select,
+textarea {
+    background: var(--velora-card) !important;
+    color: var(--velora-text) !important;
+    border: 1px solid #394357 !important;
+}
+
+/* Tables */
+#changelist table tbody tr {
+    background: var(--velora-card);
+}
+
+#changelist table tbody tr:nth-child(even) {
+    background: #1B2435;
+}
+
+/* Breadcrumbs */
+div.breadcrumbs {
+    background: #1B2435;
+    color: var(--velora-text);
+}
+/* VELORA Admin Dashboard Polish */
+
+#content h1 {
+    color: #D6B574;
+    font-family: Georgia, serif;
+    letter-spacing: 1px;
+    margin-bottom: 25px;
+}
+
+.module caption,
+.module h2 {
+    background: #1B2435 !important;
+    color: #D6B574 !important;
+    padding: 14px !important;
+    border-left: 3px solid #D6B574;
+}
+
+.module {
+    border: 1px solid #30394A;
+    margin-bottom: 25px;
+}
+
+#header {
+    padding: 15px 25px;
+}
+
+#site-name a {
+    letter-spacing: 2px;
+    font-weight: 500;
+}

@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}VELORA — Guest Checkout & Confirmation{% endblock %}
+
+{% block extra_head %}
+<style>
+    .checkout-wrapper {
+        max-width: var(--container-max);
+        margin: 2.5rem auto 5rem;
+        padding: 0 1.5rem;
+    }
+
+    .checkout-grid {
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        gap: 3rem;
+        align-items: start;
+    }
+
+    .form-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--gold-border);
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-title {
+        font-family: var(--font-serif);
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-sub {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+    }
+
+    .form-group-custom {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label-custom {
+        display: block;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--gold-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        background: rgba(16, 21, 34, 0.8);
+        border: 1px solid var(--gold-border);
+        border-radius: 6px;
+        padding: 0.85rem 1rem;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        font-family: var(--font-sans);
+        transition: var(--transition-smooth);
+    }
+
+    .form-control-custom:focus {
+        outline: none;
+        border-color: var(--gold-primary);
+        box-shadow: 0 0 16px var(--gold-glow);
+        background: rgba(21, 27, 43, 0.95);
+        color: #FFFFFF;
+    }
+
+    /* Order Review Card */
+    .review-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--gold-border);
+        border-radius: 16px;
+        padding: 2.5rem;
+        position: sticky;
+        top: 6rem;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .review-header {
+        font-family: var(--font-serif);
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(214, 181, 116, 0.15);
+        margin-bottom: 1.5rem;
+    }
+
+    .review-movie-title {
+        font-family: var(--font-serif);
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gold-primary);
+        margin-bottom: 0.35rem;
+    }
+
+    .review-meta {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid rgba(214, 181, 116, 0.1);
+    }
+
+    .seats-preview-box {
+        margin-bottom: 1.5rem;
+    }
+
+    .seat-badge-review {
+        display: inline-block;
+        background: rgba(214, 181, 116, 0.12);
+        border: 1px solid var(--gold-border-bright);
+        color: var(--gold-primary);
+        padding: 0.25rem 0.65rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin: 0.2rem;
+    }
+
+    .pricing-table {
+        margin-top: 1rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid rgba(214, 181, 116, 0.15);
+    }
+
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.65rem;
+    }
+
+    .total-price-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-top: 1.25rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--gold-border);
+    }
+
+    .total-amount-display {
+        font-family: var(--font-serif);
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--gold-primary);
+    }
+
+    .confirm-btn {
+        width: 100%;
+        margin-top: 2rem;
+        padding: 0.95rem;
+        font-size: 0.92rem;
+    }
+
+    @media (max-width: 992px) {
+        .checkout-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .review-card {
+            position: static;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-wrapper">
+    <div class="checkout-grid">
+        <!-- Customer Details Form -->
+        <div class="form-card">
+            <h1 class="form-title">Guest Concierge Details</h1>
+            <p class="form-sub">
+                Please enter your information to personalize your digital booking and confirmation.
+            </p>
+
+            <form action="{% url 'confirm_booking' %}" method="POST" id="checkoutForm">
+                {% csrf_token %}
+                <input type="hidden" name="show_id" value="{{ show.show_id }}">
+                <input type="hidden" name="seat_ids" value="{{ clean_seat_ids_csv }}">
+
+                <div class="form-group-custom">
+                    <label for="id_name" class="form-label-custom">Full Name</label>
+                    <input type="text" 
+                           id="id_name" 
+                           name="name" 
+                           class="form-control-custom" 
+                           placeholder="e.g. Rahul Sharma" 
+                           required 
+                           minlength="2" 
+                           maxlength="100">
+                </div>
+
+                <div class="form-group-custom">
+                    <label for="id_email" class="form-label-custom">Email Address (Unique Identifier)</label>
+                    <input type="email" 
+                           id="id_email" 
+                           name="email" 
+                           class="form-control-custom" 
+                           placeholder="e.g. rahul@example.com" 
+                           required 
+                           maxlength="100">
+                    <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 4px; display: block;">
+                        Your digital ticket and confirmation will be associated with this address.
+                    </small>
+                </div>
+
+                <div class="form-group-custom">
+                    <label for="id_phone" class="form-label-custom">Phone Number</label>
+                    <input type="tel" 
+                           id="id_phone" 
+                           name="phone" 
+                           class="form-control-custom" 
+                           placeholder="e.g. 9876543210" 
+                           required 
+                           minlength="7" 
+                           maxlength="15">
+                </div>
+
+                <div style="background: rgba(16, 21, 34, 0.6); border: 1px solid var(--gold-border); border-radius: 8px; padding: 1rem 1.25rem; margin-top: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 0.6rem; color: var(--gold-primary); font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem;">
+                        <span>✦</span> Velora Booking Guarantee
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">
+                        Seats are reserved using database transaction row-level locking to eliminate double-booking conflicts.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-gold confirm-btn">
+                    Confirm & Reserve Experience
+                </button>
+            </form>
+        </div>
+
+        <!-- Order Review Sidebar -->
+        <div class="review-card">
+            <h2 class="review-header">Order Summary</h2>
+
+            <div class="review-movie-title">{{ show.movie.title }}</div>
+            <div class="review-meta">
+                <div>📍 {{ show.screen.theatre.theatre_name }}</div>
+                <div>Auditorium: {{ show.screen.screen_name }}</div>
+                <div>Date: {{ show.show_date|date:"l, F d, Y" }}</div>
+                <div>Showtime: {{ show.show_time|time:"g:i A" }}</div>
+            </div>
+
+            <div class="seats-preview-box">
+                <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.5rem;">
+                    Allocated Seats ({{ seat_count }})
+                </div>
+                <div>
+                    {% for ss in selected_show_seats %}
+                    <span class="seat-badge-review">{{ ss.seat.seat_number }} ({{ ss.seat.seat_type }})</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="pricing-table">
+                <div class="price-row">
+                    <span>Base Ticket Rate</span>
+                    <span>₹{{ show.ticket_price }}</span>
+                </div>
+                <div class="price-row">
+                    <span>Quantity</span>
+                    <span>{{ seat_count }} seat{{ seat_count|pluralize }}</span>
+                </div>
+                <div class="price-row">
+                    <span>Booking Fee</span>
+                    <span style="color: var(--gold-primary);">Complimentary</span>
+                </div>
+
+                <div class="total-price-row">
+                    <div>
+                        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted);">
+                            Grand Total
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--gold-primary);">
+                            Verified Database Total
+                        </div>
+                    </div>
+                    <div class="total-amount-display">
+                        ₹{{ total_amount }}
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; text-align: center;">
+                <a href="{% url 'seat_selection' show.show_id %}" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: underline;">
+                    ← Modify Seat Selection
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

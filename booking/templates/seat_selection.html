@@ -1,0 +1,532 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}VELORA — Select Seats | {{ show.movie.title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .seat-booking-wrapper {
+        max-width: var(--container-max);
+        margin: 2rem auto 5rem;
+        padding: 0 1.5rem;
+    }
+
+    .booking-top-bar {
+        background: var(--bg-surface);
+        border: 1px solid var(--gold-border);
+        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 2.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .film-heading-title {
+        font-family: var(--font-serif);
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .film-heading-meta {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .film-heading-meta span {
+        color: var(--gold-primary);
+    }
+
+    .booking-layout-grid {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 2.5rem;
+        align-items: start;
+    }
+
+    /* Auditorium Map Container */
+    .auditorium-box {
+        background: var(--bg-surface);
+        border: 1px solid var(--gold-border);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Screen Curve Visual */
+    .screen-container {
+        width: 80%;
+        max-width: 550px;
+        margin-bottom: 3.5rem;
+        text-align: center;
+    }
+
+    .screen-curve {
+        height: 8px;
+        width: 100%;
+        background: linear-gradient(90deg, rgba(214, 181, 116, 0.1) 0%, rgba(214, 181, 116, 0.8) 50%, rgba(214, 181, 116, 0.1) 100%);
+        border-radius: 50% / 100% 100% 0 0;
+        box-shadow: 0 4px 20px rgba(214, 181, 116, 0.4);
+        margin-bottom: 0.75rem;
+    }
+
+    .screen-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        color: var(--text-muted);
+    }
+
+    /* Seat Legend */
+    .seat-legend {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 3rem;
+        padding: 0.75rem 1.5rem;
+        background: rgba(16, 21, 34, 0.6);
+        border-radius: 50px;
+        border: 1px solid var(--gold-border);
+        flex-wrap: wrap;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .legend-indicator {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+    }
+
+    .legend-available {
+        background: rgba(21, 27, 43, 0.9);
+        border: 1px solid var(--gold-border-bright);
+    }
+
+    .legend-selected {
+        background: var(--gold-primary);
+        box-shadow: 0 0 10px var(--gold-primary);
+    }
+
+    .legend-booked {
+        background: #252D3F;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        opacity: 0.45;
+    }
+
+    /* Grid of Seats */
+    .seats-grid-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        width: 100%;
+        max-width: 520px;
+        margin: 0 auto;
+    }
+
+    .seat-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .row-label {
+        width: 24px;
+        font-family: var(--font-serif);
+        font-weight: 600;
+        color: var(--gold-primary);
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .row-seats {
+        display: flex;
+        gap: 0.85rem;
+    }
+
+    /* Individual Seat Button / Label */
+    .seat-checkbox {
+        display: none;
+    }
+
+    .seat-item {
+        width: 44px;
+        height: 44px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        user-select: none;
+        position: relative;
+    }
+
+    /* Available State */
+    .seat-item.available {
+        background: rgba(21, 27, 43, 0.95);
+        border: 1px solid var(--gold-border-bright);
+        color: var(--text-primary);
+    }
+
+    .seat-item.available:hover {
+        background: rgba(214, 181, 116, 0.18);
+        border-color: var(--gold-primary);
+        color: var(--gold-light);
+        transform: scale(1.08);
+        box-shadow: 0 0 12px var(--gold-glow);
+    }
+
+    /* Selected State */
+    .seat-item.selected {
+        background: linear-gradient(135deg, #F3E5AB 0%, #D6B574 100%) !important;
+        border: 1px solid var(--gold-light) !important;
+        color: #0A0D15 !important;
+        font-weight: 700;
+        transform: scale(1.08);
+        box-shadow: 0 0 16px rgba(214, 181, 116, 0.6);
+    }
+
+    /* Booked State */
+    .seat-item.booked {
+        background: #1C2333;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.25);
+        cursor: not-allowed;
+        opacity: 0.45;
+    }
+
+    /* Tier Separation Tag */
+    .tier-indicator {
+        font-size: 0.72rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold-primary);
+        text-align: center;
+        margin: 1.5rem 0 0.5rem;
+        position: relative;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .tier-indicator::before,
+    .tier-indicator::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: rgba(214, 181, 116, 0.2);
+    }
+
+    /* Order Summary Card */
+    .summary-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--gold-border);
+        border-radius: 16px;
+        padding: 2rem;
+        position: sticky;
+        top: 6rem;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+    }
+
+    .summary-title {
+        font-family: var(--font-serif);
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(214, 181, 116, 0.15);
+        margin-bottom: 1.25rem;
+    }
+
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.75rem;
+    }
+
+    .summary-total-box {
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid rgba(214, 181, 116, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+    }
+
+    .summary-total-amount {
+        font-family: var(--font-serif);
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gold-primary);
+    }
+
+    .selected-seats-badge-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        min-height: 32px;
+        margin-bottom: 1.25rem;
+    }
+
+    .seat-badge {
+        background: rgba(214, 181, 116, 0.15);
+        border: 1px solid var(--gold-border-bright);
+        color: var(--gold-primary);
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+    }
+
+    .checkout-btn {
+        width: 100%;
+        margin-top: 1.5rem;
+        padding: 0.85rem;
+        font-size: 0.88rem;
+    }
+
+    .checkout-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        filter: grayscale(0.8);
+        box-shadow: none;
+    }
+
+    @media (max-width: 992px) {
+        .booking-layout-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-card {
+            position: static;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="seat-booking-wrapper">
+    <!-- Top Details Banner -->
+    <div class="booking-top-bar">
+        <div>
+            <h1 class="film-heading-title">{{ show.movie.title }}</h1>
+            <div class="film-heading-meta">
+                <span>📍 {{ show.screen.theatre.theatre_name }}</span>
+                <span>•</span>
+                <span>{{ show.screen.screen_name }}</span>
+                <span>•</span>
+                <span>{{ show.show_date|date:"l, M d, Y" }}</span>
+                <span>•</span>
+                <span>{{ show.show_time|time:"g:i A" }}</span>
+            </div>
+        </div>
+
+        <div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted);">
+                Admission Price
+            </div>
+            <div style="font-family: var(--font-serif); font-size: 1.4rem; font-weight: 600; color: var(--gold-primary);">
+                ₹{{ show.ticket_price }} <span style="font-size: 0.75rem; color: var(--text-secondary); font-family: var(--font-sans); font-weight: 400;">/ seat</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Form -->
+    <form action="{% url 'booking_checkout' %}" method="POST" id="seatForm">
+        {% csrf_token %}
+        <input type="hidden" name="show_id" value="{{ show.show_id }}">
+
+        <div class="booking-layout-grid">
+            <!-- Auditorium Seat Map -->
+            <div class="auditorium-box">
+                <!-- Curved Cinema Screen -->
+                <div class="screen-container">
+                    <div class="screen-curve"></div>
+                    <div class="screen-label">Velora Curved Auditorium Screen</div>
+                </div>
+
+                <!-- Seat Legend -->
+                <div class="seat-legend">
+                    <div class="legend-item">
+                        <div class="legend-indicator legend-available"></div>
+                        <span>Available</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-indicator legend-selected"></div>
+                        <span>Selected</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-indicator legend-booked"></div>
+                        <span>Booked</span>
+                    </div>
+                </div>
+
+                <!-- Seats Map -->
+                <div class="seats-grid-wrapper">
+                    {% for row_letter, seats_in_row in seat_rows.items %}
+                        {% if row_letter == 'B' %}
+                        <div class="tier-indicator">Premium Suite Row</div>
+                        {% elif row_letter == 'A' %}
+                        <div class="tier-indicator">Executive Row</div>
+                        {% endif %}
+
+                        <div class="seat-row">
+                            <span class="row-label">{{ row_letter }}</span>
+                            <div class="row-seats">
+                                {% for ss in seats_in_row %}
+                                    {% if ss.status == 'BOOKED' %}
+                                        <div class="seat-item booked" title="{{ ss.seat.seat_number }} (Booked)">
+                                            {{ ss.seat.seat_number }}
+                                        </div>
+                                    {% else %}
+                                        <label class="seat-item available" 
+                                               id="seat-btn-{{ ss.show_seat_id }}" 
+                                               for="seat-input-{{ ss.show_seat_id }}" 
+                                               title="{{ ss.seat.seat_number }} ({{ ss.seat.seat_type }}) - ₹{{ show.ticket_price }}">
+                                            <input type="checkbox" 
+                                                   name="seat_ids" 
+                                                   value="{{ ss.show_seat_id }}" 
+                                                   id="seat-input-{{ ss.show_seat_id }}" 
+                                                   class="seat-checkbox" 
+                                                   data-seat-number="{{ ss.seat.seat_number }}"
+                                                   data-seat-type="{{ ss.seat.seat_type }}">
+                                            {{ ss.seat.seat_number }}
+                                        </label>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Real-Time Price Calculation & Summary Card -->
+            <div class="summary-card">
+                <h3 class="summary-title">Booking Summary</h3>
+
+                <div class="summary-line">
+                    <span>Movie</span>
+                    <strong style="color: var(--text-primary);">{{ show.movie.title }}</strong>
+                </div>
+
+                <div class="summary-line">
+                    <span>Showtime</span>
+                    <span>{{ show.show_time|time:"g:i A" }}</span>
+                </div>
+
+                <div class="summary-line">
+                    <span>Screen</span>
+                    <span>{{ show.screen.screen_name }}</span>
+                </div>
+
+                <div class="summary-line">
+                    <span>Unit Price</span>
+                    <span>₹{{ show.ticket_price }}</span>
+                </div>
+
+                <div style="margin: 1.25rem 0 0.5rem; font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">
+                    Selected Seats (<span id="seatCountText">0</span>)
+                </div>
+
+                <div class="selected-seats-badge-list" id="selectedBadges">
+                    <span style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">No seats selected</span>
+                </div>
+
+                <div class="summary-total-box">
+                    <div>
+                        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted);">
+                            Total Amount
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--gold-primary);">
+                            Database rate: ₹{{ show.ticket_price }}
+                        </div>
+                    </div>
+                    <div class="summary-total-amount" id="totalPriceText">
+                        ₹0.00
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-gold checkout-btn" id="proceedBtn" disabled>
+                    Proceed to Guest Checkout
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Live Seat Selection & Automatic Calculation
+    const ticketPrice = parseFloat("{{ show.ticket_price }}") || 0;
+    const checkboxes = document.querySelectorAll('.seat-checkbox');
+    const selectedBadges = document.getElementById('selectedBadges');
+    const seatCountText = document.getElementById('seatCountText');
+    const totalPriceText = document.getElementById('totalPriceText');
+    const proceedBtn = document.getElementById('proceedBtn');
+
+    function updateSelectionSummary() {
+        const selectedCheckboxes = document.querySelectorAll('.seat-checkbox:checked');
+        const count = selectedCheckboxes.length;
+        seatCountText.textContent = count;
+
+        // Calculate total
+        const total = (count * ticketPrice).toFixed(2);
+        totalPriceText.textContent = `₹${total}`;
+
+        // Update Badges List
+        if (count === 0) {
+            selectedBadges.innerHTML = '<span style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">No seats selected</span>';
+            proceedBtn.disabled = true;
+        } else {
+            selectedBadges.innerHTML = '';
+            selectedCheckboxes.forEach(cb => {
+                const badge = document.createElement('span');
+                badge.className = 'seat-badge';
+                badge.textContent = `${cb.dataset.seatNumber} (${cb.dataset.seatType})`;
+                selectedBadges.appendChild(badge);
+            });
+            proceedBtn.disabled = false;
+        }
+    }
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            const label = document.getElementById(`seat-btn-${this.value}`);
+            if (this.checked) {
+                label.classList.add('selected');
+            } else {
+                label.classList.remove('selected');
+            }
+            updateSelectionSummary();
+        });
+    });
+</script>
+{% endblock %}

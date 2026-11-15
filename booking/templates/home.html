@@ -1,0 +1,1021 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}VELORA — Where Every Frame Becomes an Experience{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* -------------------------------------------
+       HOMEPAGE HERO SECTION
+    ------------------------------------------- */
+    .hero-section {
+        position: relative;
+        min-height: 82vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 6rem 1.5rem 4rem;
+        overflow: hidden;
+    }
+
+    /* Ambient Hero Glow &amp;  Vignette */
+    .hero-backdrop {
+        position: absolute;
+        inset: 0;
+        background: 
+            radial-gradient(circle at 50% 30%, rgba(214, 181, 116, 0.12) 0%, transparent 60%),
+            radial-gradient(circle at 50% 90%, rgba(16, 21, 34, 1) 0%, transparent 80%),
+            linear-gradient(180deg, rgba(16, 21, 34, 0.4) 0%, #101522 100%);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 960px;
+        margin: 0 auto;
+    }
+
+    .hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.4rem 1.2rem;
+        border-radius: 50px;
+        background: rgba(214, 181, 116, 0.08);
+        border: 1px solid var(--gold-border);
+        color: var(--gold-primary);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(8px);
+    }
+
+    .hero-pill-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--gold-primary);
+        box-shadow: 0 0 8px var(--gold-primary);
+    }
+
+    .hero-title {
+        font-family: var(--font-serif);
+        font-size: clamp(2.4rem, 5.5vw, 4.4rem);
+        font-weight: 600;
+        line-height: 1.15;
+        letter-spacing: 0.03em;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        text-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .hero-title .gold-accent {
+        background: linear-gradient(135deg, #FFF1D0 0%, #D6B574 50%, #B38634 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: var(--gold-primary);
+    }
+
+    .hero-tagline-sub {
+        font-size: clamp(1rem, 1.8vw, 1.25rem);
+        color: var(--text-secondary);
+        max-width: 720px;
+        margin: 0 auto 2.5rem;
+        font-weight: 300;
+        line-height: 1.7;
+        letter-spacing: 0.02em;
+    }
+
+    .hero-cta-group {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+    }
+
+    /* Prestige Highlights Bar */
+    .prestige-bar {
+        position: relative;
+        z-index: 2;
+        max-width: var(--container-max);
+        margin: -2rem auto 4.5rem;
+        padding: 0 1.5rem;
+    }
+
+    .prestige-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--gold-border);
+        border: 1px solid var(--gold-border);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .prestige-item {
+        background: rgba(21, 27, 43, 0.95);
+        backdrop-filter: blur(12px);
+        padding: 1.6rem 1.4rem;
+        text-align: center;
+        transition: var(--transition-smooth);
+    }
+
+    .prestige-item:hover {
+        background: rgba(27, 35, 56, 0.98);
+    }
+
+    .prestige-number {
+        font-family: var(--font-serif);
+        font-size: 1.3rem;
+        color: var(--gold-primary);
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
+    }
+
+    .prestige-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    /* -------------------------------------------
+       SECTION ARCHITECTURE
+    ------------------------------------------- */
+    .content-section {
+        max-width: var(--container-max);
+        margin: 0 auto;
+        padding: 4.5rem 1.5rem;
+        position: relative;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 3.5rem;
+    }
+
+    .section-eyebrow {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--gold-primary);
+        margin-bottom: 0.75rem;
+        display: inline-block;
+    }
+
+    .section-title {
+        font-family: var(--font-serif);
+        font-size: clamp(2rem, 3.5vw, 2.75rem);
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+    }
+
+    .section-divider {
+        width: 48px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+        margin: 1.25rem auto 0;
+    }
+
+    /* -------------------------------------------
+       NOW SHOWING: MOVIES SECTION & POSTER CARDS
+    ------------------------------------------- */
+    .movies-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2.25rem;
+    }
+
+    .movie-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--gold-border);
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: var(--transition-smooth);
+        position: relative;
+    }
+
+    .movie-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 3;
+    }
+
+    .movie-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--gold-border-bright);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 24px rgba(214, 181, 116, 0.12);
+    }
+
+    .movie-card:hover::before {
+        opacity: 1;
+    }
+
+    /* Luxury Movie Poster Box with aspect ratio & hover */
+    .movie-poster-box {
+        position: relative;
+        width: 100%;
+        height: 400px;
+        background: #0B0F18;
+        border-bottom: 1px solid var(--gold-border);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .movie-poster-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        display: block;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
+    }
+
+    .movie-card:hover .movie-poster-img {
+        transform: scale(1.05);
+        filter: brightness(1.06) contrast(1.03);
+    }
+
+    /* Subtle cinematic bottom gradient blend into card body */
+    .poster-overlay-gradient {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            180deg, 
+            rgba(16, 21, 34, 0.08) 0%, 
+            rgba(16, 21, 34, 0) 50%, 
+            rgba(21, 27, 43, 0.96) 100%
+        );
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    /* Graceful Fallback if image fails or is unavailable */
+    .movie-poster-fallback {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, #1A2236 0%, #101522 100%);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .poster-art-bg {
+        position: absolute;
+        inset: 0;
+        opacity: 0.25;
+        background: 
+            radial-gradient(circle at 50% 50%, rgba(214, 181, 116, 0.2) 0%, transparent 70%),
+            repeating-linear-gradient(45deg, rgba(214, 181, 116, 0.05) 0px, rgba(214, 181, 116, 0.05) 2px, transparent 2px, transparent 12px);
+    }
+
+    .poster-watermark {
+        font-family: var(--font-serif);
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: rgba(214, 181, 116, 0.15);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        user-select: none;
+        position: relative;
+        z-index: 1;
+    }
+
+    .movie-badge-rating {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(16, 21, 34, 0.88);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid var(--gold-border-bright);
+        padding: 0.35rem 0.7rem;
+        border-radius: 4px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--gold-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        z-index: 2;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .movie-badge-rating span {
+        color: var(--gold-light);
+    }
+
+    .movie-badge-genre {
+        position: absolute;
+        bottom: 1.25rem;
+        left: 1.25rem;
+        background: rgba(16, 21, 34, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid var(--gold-border);
+        padding: 0.3rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--gold-primary);
+        z-index: 2;
+    }
+
+    .movie-body {
+        padding: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        position: relative;
+        z-index: 2;
+    }
+
+    .movie-title {
+        font-family: var(--font-serif);
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        letter-spacing: 0.03em;
+        margin-bottom: 0.6rem;
+    }
+
+    .movie-meta {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+
+    .movie-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .movie-synopsis {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        flex: 1;
+    }
+
+    .movie-actions {
+        padding-top: 1rem;
+        border-top: 1px solid rgba(214, 181, 116, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .movie-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Empty state */
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4.5rem 2rem;
+        background: var(--bg-surface);
+        border: 1px dashed var(--gold-border);
+        border-radius: 12px;
+    }
+
+    .empty-state p {
+        font-family: var(--font-serif);
+        font-size: 1.15rem;
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+    }
+
+    /* -------------------------------------------
+       AVAILABLE THEATRES SECTION
+    ------------------------------------------- */
+    .theatres-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 2rem;
+    }
+
+    .theatre-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--gold-border);
+        border-radius: 12px;
+        padding: 2.25rem 2rem;
+        transition: var(--transition-smooth);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .theatre-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--gold-border-bright);
+        box-shadow: 0 14px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .theatre-eyebrow {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--gold-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .theatre-name {
+        font-family: var(--font-serif);
+        font-size: 1.45rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.6rem;
+    }
+
+    .theatre-location {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .theatre-amenities {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        padding-top: 1.25rem;
+        border-top: 1px solid rgba(214, 181, 116, 0.1);
+    }
+
+    .amenity-tag {
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.25rem 0.6rem;
+        border-radius: 4px;
+    }
+
+    /* -------------------------------------------
+       SHOWTIMES / SCHEDULE SECTION
+    ------------------------------------------- */
+    .showtimes-container {
+        background: var(--bg-surface);
+        border: 1px solid var(--gold-border);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .showtimes-header-bar {
+        background: rgba(16, 21, 34, 0.6);
+        padding: 1.25rem 1.75rem;
+        border-bottom: 1px solid var(--gold-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .showtimes-count {
+        font-size: 0.82rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--gold-primary);
+        font-weight: 600;
+    }
+
+    .shows-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .show-row {
+        display: grid;
+        grid-template-columns: 2fr 1.2fr 1fr 1fr 1.2fr;
+        align-items: center;
+        padding: 1.5rem 1.75rem;
+        border-bottom: 1px solid rgba(214, 181, 116, 0.08);
+        transition: var(--transition-smooth);
+    }
+
+    .show-row:last-child {
+        border-bottom: none;
+    }
+
+    .show-row:hover {
+        background: var(--bg-surface-elevated);
+    }
+
+    .show-movie-col {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .show-movie-title {
+        font-family: var(--font-serif);
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .show-screen-name {
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+
+    .show-date-col {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .show-time-col {
+        font-family: var(--font-serif);
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--gold-primary);
+    }
+
+    .show-price-col {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .show-price-amount {
+        font-family: var(--font-serif);
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .show-price-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 0.1em;
+    }
+
+    .show-action-col {
+        text-align: right;
+    }
+
+    /* -------------------------------------------
+       EXPERIENCE / ATMOSPHERE FEATURE
+    ------------------------------------------- */
+    .experience-section {
+        background: linear-gradient(180deg, var(--bg-midnight) 0%, #0A0D15 100%);
+        border-top: 1px solid var(--gold-border);
+        border-bottom: 1px solid var(--gold-border);
+        padding: 6rem 1.5rem;
+    }
+
+    .experience-container {
+        max-width: var(--container-max);
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+    }
+
+    .experience-text h3 {
+        font-family: var(--font-serif);
+        font-size: 2.25rem;
+        line-height: 1.3;
+        margin-bottom: 1.5rem;
+    }
+
+    .experience-text p {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        line-height: 1.8;
+        margin-bottom: 2rem;
+    }
+
+    .experience-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .experience-list-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .experience-bullet {
+        width: 8px;
+        height: 8px;
+        background: var(--gold-primary);
+        border-radius: 50%;
+        margin-top: 8px;
+        flex-shrink: 0;
+        box-shadow: 0 0 10px var(--gold-primary);
+    }
+
+    .experience-item-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .experience-item-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .experience-visual {
+        background: var(--bg-surface);
+        border: 1px solid var(--gold-border);
+        border-radius: 16px;
+        padding: 3rem 2.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .experience-visual::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(214, 181, 116, 0.1) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .experience-visual-brand {
+        font-family: var(--font-serif);
+        font-size: 3rem;
+        font-weight: 700;
+        letter-spacing: 0.3em;
+        color: var(--gold-primary);
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #FFF0CC 0%, #D6B574 50%, #B08535 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .experience-visual-tagline {
+        font-family: var(--font-serif);
+        font-size: 1.15rem;
+        font-style: italic;
+        color: var(--text-secondary);
+        letter-spacing: 0.05em;
+        margin-bottom: 2rem;
+    }
+
+    /* -------------------------------------------
+       RESPONSIVE BREAKPOINTS
+    ------------------------------------------- */
+    @media (max-width: 992px) {
+        .prestige-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .show-row {
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 1.25rem;
+        }
+
+        .show-action-col {
+            grid-column: 1 / -1;
+            text-align: left;
+        }
+
+        .experience-container {
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .prestige-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .movies-grid,
+        .theatres-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .show-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ==========================================
+     HERO SECTION
+========================================== -->
+<section class="hero-section">
+    <div class="hero-backdrop"></div>
+    <div class="hero-content">
+        <div class="hero-pill">
+            <span class="hero-pill-dot"></span>
+            Curated Cinematic Excellence
+        </div>
+
+        <h1 class="hero-title">
+            Where Every Frame<br>
+            <span class="gold-accent">Becomes an Experience.</span>
+        </h1>
+
+        <p class="hero-tagline-sub">
+            Welcome to VELORA. Indulge in an elevated standard of cinema featuring laser projection, immersive acoustic soundscapes, and bespoke auditoriums designed for the connoisseur.
+        </p>
+
+        <div class="hero-cta-group">
+            <a href="#movies" class="btn-gold">Explore Now Showing</a>
+            <a href="#theatres" class="btn-outline-gold">Our Theatres</a>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================
+     PRESTIGE HIGHLIGHTS BAR
+========================================== -->
+<div class="prestige-bar">
+    <div class="prestige-grid">
+        <div class="prestige-item">
+            <div class="prestige-number">4K LASER</div>
+            <div class="prestige-label">Ultra-High Dynamic Range</div>
+        </div>
+        <div class="prestige-item">
+            <div class="prestige-number">DOLBY ATMOS®</div>
+            <div class="prestige-label">360° Spatial Acoustics</div>
+        </div>
+        <div class="prestige-item">
+            <div class="prestige-number">PLUSH SUITES</div>
+            <div class="prestige-label">Handcrafted Recliners</div>
+        </div>
+        <div class="prestige-item">
+            <div class="prestige-number">BESPOKE</div>
+            <div class="prestige-label">In-Seat Sommelier Service</div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================
+     NOW SHOWING: MOVIES
+========================================== -->
+<section class="content-section" id="movies">
+    <div class="section-header">
+        <span class="section-eyebrow">Curated Repertoire</span>
+        <h2 class="section-title">Now Showing at VELORA</h2>
+        <div class="section-divider"></div>
+    </div>
+
+    <div class="movies-grid">
+        {% for movie in movies %}
+        
+        {# Dynamic Poster Mapping for Local Static Assets #}
+        {% if movie.title == "Inception" %}
+            {% static "booking/images/posters/inception.jpg" as poster_src %}
+        {% elif movie.title == "Interstellar" %}
+            {% static "booking/images/posters/interstellar.jpg" as poster_src %}
+        {% elif movie.title == "3 Idiots" %}
+            {% static "booking/images/posters/3-idiots.jpg" as poster_src %}
+        {% else %}
+            {% static "booking/images/posters/default-poster.jpg" as poster_src %}
+        {% endif %}
+
+        <article class="movie-card">
+            <div class="movie-poster-box">
+                <img src="{{ poster_src }}" 
+                     alt="{{ movie.title }} Poster" 
+                     class="movie-poster-img"
+                     loading="lazy"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                
+                <!-- Graceful Fallback if image fails to load -->
+                <div class="movie-poster-fallback">
+                    <div class="poster-art-bg"></div>
+                    <div class="poster-watermark">VELORA</div>
+                </div>
+
+                <div class="poster-overlay-gradient"></div>
+
+                {% if movie.rating %}
+                <div class="movie-badge-rating">
+                    <span>★</span> {{ movie.rating }}
+                </div>
+                {% endif %}
+
+                {% if movie.genre %}
+                <div class="movie-badge-genre">
+                    {{ movie.genre }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="movie-body">
+                <h3 class="movie-title">{{ movie.title }}</h3>
+                
+                <div class="movie-meta">
+                    {% if movie.duration %}
+                    <span class="movie-meta-item">{{ movie.duration }} min</span>
+                    {% endif %}
+                    
+                    {% if movie.language %}
+                    <span class="movie-meta-item">• {{ movie.language }}</span>
+                    {% endif %}
+
+                    {% if movie.release_date %}
+                    <span class="movie-meta-item">• {{ movie.release_date|date:"Y" }}</span>
+                    {% endif %}
+                </div>
+
+                <p class="movie-synopsis">
+                    {% if movie.description %}
+                        {{ movie.description|truncatewords:24 }}
+                    {% else %}
+                        Experience the masterful visual and auditory storytelling of {{ movie.title }}, curated exclusively for VELORA auditoriums.
+                    {% endif %}
+                </p>
+
+                <div class="movie-actions">
+                    <a href="{% url 'movie_detail' movie.movie_id %}" class="btn-outline-gold movie-btn">View Movie &amp; Shows</a>
+                </div>
+            </div>
+        </article>
+        {% empty %}
+        <div class="empty-state">
+            <p>No titles currently scheduled. Inquire with our concierge for private screenings.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ==========================================
+     THE VELORA CINEMATIC EXPERIENCE
+========================================== -->
+<section class="experience-section" id="experiences">
+    <div class="experience-container">
+        <div class="experience-text">
+            <span class="section-eyebrow">The Velora Standard</span>
+            <h3>Engineered for Pure Cinematic Wonder</h3>
+            <p>
+                Every element within a VELORA auditorium is tailored to immerse you entirely within the director's vision. From customized acoustic paneling to personalized comfort, every visit is a sensory journey.
+            </p>
+            <ul class="experience-list">
+                <li class="experience-list-item">
+                    <div class="experience-bullet"></div>
+                    <div>
+                        <div class="experience-item-title">Acoustic Perfection</div>
+                        <div class="experience-item-desc">Custom-engineered architectural sound baffles calibrated for crystal clarity.</div>
+                    </div>
+                </li>
+                <li class="experience-list-item">
+                    <div class="experience-bullet"></div>
+                    <div>
+                        <div class="experience-item-title">Zero Compromise Seating</div>
+                        <div class="experience-item-desc">Italian leather motorized recliners with generous personal space and table service.</div>
+                    </div>
+                </li>
+                <li class="experience-list-item">
+                    <div class="experience-bullet"></div>
+                    <div>
+                        <div class="experience-item-title">Pristine Projection</div>
+                        <div class="experience-item-desc">High-contrast Barco laser projectors ensuring deep blacks and vivid hues.</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="experience-visual">
+            <div class="experience-visual-brand">VELORA</div>
+            <p class="experience-visual-tagline">“Where Every Frame Becomes an Experience.”</p>
+            <a href="#shows" class="btn-gold">Reserve Your Seats</a>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================
+     OUR THEATRES
+========================================== -->
+<section class="content-section" id="theatres">
+    <div class="section-header">
+        <span class="section-eyebrow">Distinguished Venues</span>
+        <h2 class="section-title">Our Theatres</h2>
+        <div class="section-divider"></div>
+    </div>
+
+    <div class="theatres-grid">
+        {% for theatre in theatres %}
+        <div class="theatre-card">
+            <div>
+                <span class="theatre-eyebrow">VELORA DESTINATION</span>
+                <h3 class="theatre-name">{{ theatre.theatre_name }}</h3>
+                <div class="theatre-location">
+                    <span>✦</span> {{ theatre.location }}
+                </div>
+            </div>
+
+            <div class="theatre-amenities">
+                <span class="amenity-tag">Laser Screen</span>
+                <span class="amenity-tag">VIP Lounge</span>
+                <span class="amenity-tag">Valet Parking</span>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <p>No theatre venues currently listed.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ==========================================
+     SHOWTIMES & SCREENINGS
+========================================== -->
+<section class="content-section" id="shows">
+    <div class="section-header">
+        <span class="section-eyebrow">Reservations &amp; Timetable</span>
+        <h2 class="section-title">Available Shows</h2>
+        <div class="section-divider"></div>
+    </div>
+
+    <div class="showtimes-container">
+        <div class="showtimes-header-bar">
+            <span class="showtimes-count">Scheduled Screenings</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">All times local</span>
+        </div>
+
+        <div class="shows-list">
+            {% for show in shows %}
+            <div class="show-row">
+                <div class="show-movie-col">
+                    <span class="show-movie-title">{{ show.movie.title }}</span>
+                    {% if show.screen %}
+                    <span class="show-screen-name">{{ show.screen.screen_name }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="show-date-col">
+                    {{ show.show_date|date:"l, F d, Y" }}
+                </div>
+
+                <div class="show-time-col">
+                    {{ show.show_time|time:"g:i A" }}
+                </div>
+
+                <div class="show-price-col">
+                    <span class="show-price-amount">₹{{ show.ticket_price }}</span>
+                    <span class="show-price-label">Per Ticket</span>
+                </div>
+
+                <div class="show-action-col">
+                    <a href="{% url 'seat_selection' show.show_id %}" class="btn-gold" style="padding: 0.5rem 1.1rem; font-size: 0.78rem;">Book Seats</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <p>No upcoming shows found in the schedule.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
