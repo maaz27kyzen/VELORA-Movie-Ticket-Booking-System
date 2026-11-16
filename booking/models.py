@@ -21,6 +21,8 @@ class Customer(models.Model):
 
 
 class Movie(models.Model):
+    def __str__(self):
+        return self.title
     movie_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=150)
     genre = models.CharField(max_length=50)
@@ -46,6 +48,8 @@ class Theatre(models.Model):
 
 
 class Screen(models.Model):
+    def __str__(self):
+        return f"{self.screen_name} - {self.theatre.theatre_name}"
     screen_id = models.AutoField(primary_key=True)
     theatre = models.ForeignKey(Theatre, models.DO_NOTHING)
     screen_name = models.CharField(max_length=50)

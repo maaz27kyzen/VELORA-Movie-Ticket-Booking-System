@@ -64,6 +64,36 @@ class MovieShowAdmin(admin.ModelAdmin):
     search_fields = ('movie__title',)
     ordering = ('show_date', 'show_time')
 
+    def save_model(self, request, obj, form, change):
+        # Save the movie show first
+        super().save_model(request, obj, form, change)
+
+        # Get all physical seats belonging to the selected screen
+        screen_seats = Seat.objects.filter(screen=obj.screen)
+
+        # Find existing seat records for this show
+        existing_seat_ids = ShowSeat.objects.filter(
+            show=obj
+        ).values_list('seat_id', flat=True)
+
+        # Identify seats that do not yet have a ShowSeat record
+        new_show_seats = [
+            ShowSeat(
+                show=obj,
+                seat=seat,
+                status='AVAILABLE'
+            )
+            for seat in screen_seats
+            if seat.seat_id not in existing_seat_ids
+        ]
+
+        # Create all missing seat records
+        if new_show_seats:
+            ShowSeat.objects.bulk_create(
+                new_show_seats,
+                ignore_conflicts=True
+            )
+
 
 # --------------------------------
 # READ-ONLY RECORDS
